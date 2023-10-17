@@ -1,0 +1,12 @@
+/* .App {
+  font-family: sans-serif;
+  text-align: center;
+} */
+
+.video {
+  border: solid 1px #000;
+}
+
+.liked-true {
+  background-color: #00f;
+}
