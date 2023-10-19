@@ -14,15 +14,20 @@ const Filter = ({ onFilter }) => {
   );
 };
 
-const SearchInput = ({ videoList, setVideoList, onChange }) => {
-  return <input type="text" onChange={onChange} />;
+const SearchInput = ({ videoList, setVideoList, query, onChange }) => {
+  return (
+    <div className="search">
+      <p>Search:</p>
+      <input value={query} type="search" onChange={onChange} />
+    </div>
+  );
 };
 
 const LikeButton = ({ video, onLike }) => {
   return (
-    <div>
-      <button className={"liked-" + video.isLiked} onClick={onLike}>
-        👍
+    <div className="video-disp-like">
+      <button className={"like-btn liked-" + video.isLiked} onClick={onLike}>
+        <span>👍</span>
       </button>
       <p>{video.likes + " likes"}</p>
     </div>
@@ -48,8 +53,8 @@ const Video = ({ videoList, setVideoList, video }) => {
 
   return (
     <div className="video">
-      <p>{video.title}</p>
-      <p>{video.views} views</p>
+      <p className="video-disp-title">{video.title}</p>
+      <p className="video-disp-views">{video.views} views</p>
       <LikeButton
         videoList={videoList}
         video={video}
@@ -123,14 +128,14 @@ export default function FilterableVideoList() {
     setVideoList(videoList.map((item) => item));
   };
 
-  const [searchText, setSearchText] = useState("");
-  const [visibleVideoList, setVisibleVideoList] = useState([]);
-  // const foundVideos = filterVideos(videos, searchText);
+  const [query, setQuery] = useState("");
 
-  const search = (event) => {
-    console.log(event.target.value);
-    // setSearchText(newText);
-  };
+  const foundVideos = videoList.filter(
+    (video) => {
+      return video.title.toLowerCase().includes(query.toLowerCase());
+    },
+    [videoList, query]
+  );
 
   return (
     <div className="filterable-video-list">
@@ -139,10 +144,14 @@ export default function FilterableVideoList() {
       <SearchInput
         videoList={videoList}
         setVideoList={setVideoList}
-        onChange={search}
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
       />
       <br />
-      <VideoList videoList={videoList} setVideoList={setVideoList}></VideoList>
+      <VideoList
+        videoList={foundVideos}
+        setVideoList={setVideoList}
+      ></VideoList>
     </div>
   );
 }
