@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./App.css";
 
-const Filter = ({ onFilter }) => {
+const VideoUpload = ({ videoList, setVideoList, handleUpload }) => {
   return (
-    <div className="filter">
-      <p>Filter:</p>
-      <select onChange={onFilter}>
-        <option value="alphabetical">Alphabetical</option>
-        <option value="views">Views</option>
-        <option value="likes">Likes</option>
-      </select>
+    <div className="video-upload">
+      <p>Upload</p>
+
+      <form onSubmit={handleUpload}>
+        <label htmlFor="title">Title:</label>
+        <br />
+        <input id="title" type="text" />
+        <input type="submit" value="Upload" />
+      </form>
     </div>
   );
 };
@@ -19,6 +21,20 @@ const SearchInput = ({ videoList, setVideoList, query, onChange }) => {
     <div className="search">
       <p>Search:</p>
       <input value={query} type="search" onChange={onChange} />
+    </div>
+  );
+};
+
+const Sorter = ({ handleSort }) => {
+  return (
+    <div className="sorter">
+      <p>Sort by</p>
+      <select onChange={handleSort}>
+        <option value="recent">Recent</option>
+        <option value="alphabetical">Alphabetical</option>
+        <option value="views">Views</option>
+        <option value="likes">Likes</option>
+      </select>
     </div>
   );
 };
@@ -43,8 +59,8 @@ const Video = ({ videoList, setVideoList, video }) => {
       video.likes--;
     }
 
-    // If current filter is set to sort by likes, update Video List
-    if (filteredByLikes) {
+    // If current sorter is set to sort by likes, update Video List
+    if (isSortedByLikes) {
       setVideoList(videoList.sort((a, b) => b.likes - a.likes));
     }
 
@@ -79,27 +95,28 @@ const VideoList = ({ videoList, setVideoList }) => {
   );
 };
 
-var filteredByLikes = false;
+var isSortedByLikes = false;
+var currentVideoId = 0;
 
 export default function FilterableVideoList() {
   class VideoClass {
-    constructor(title, numofViews, numOfLikes) {
+    constructor(title) {
       this.title = title;
-      this.id = uuidv4();
-      this.views = numofViews;
-      this.likes = numOfLikes;
+      this.id = currentVideoId;
+      this.views = Math.floor(Math.random() * 101);
+      this.likes = Math.floor(this.views * (Math.random() * Math.random()));
       this.isLiked = false;
     }
   }
 
-  function uuidv4() {
+  const uuidv4 = () => {
     return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (c) =>
       (
         c ^
         (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
       ).toString(16)
     );
-  }
+  };
 
   let video1 = new VideoClass("Top 10 Pokemon Catches of All Time", 48, 12);
   let video2 = new VideoClass(
@@ -109,10 +126,34 @@ export default function FilterableVideoList() {
   );
   let video3 = new VideoClass("Pause Challenge on Family", 500, 12);
 
-  const [videoList, setVideoList] = useState([video1, video2, video3]);
+  const [videoList, setVideoList] = useState([]);
+  const [query, setQuery] = useState("");
 
-  const filter = (event) => {
-    switch (event.target.value) {
+  const handleUpload = (e) => {
+    e.preventDefault();
+    if (e.currentTarget.title.value.length === 0) {
+      alert("Please enter a title name");
+      return;
+    }
+
+    const value = new VideoClass(e.currentTarget.title.value.toString());
+    setVideoList((prev) => {
+      return [...prev, value];
+    });
+    currentVideoId++;
+
+    e.currentTarget.title.value = "";
+  };
+
+  const foundVideos = videoList.filter(
+    (video) => {
+      return video.title.toLowerCase().includes(query.toLowerCase());
+    },
+    [videoList, query]
+  );
+
+  const handleSort = (e) => {
+    switch (e.target.value) {
       case "alphabetical":
         setVideoList(videoList.sort((a, b) => a.title.localeCompare(b.title)));
         break;
@@ -122,24 +163,19 @@ export default function FilterableVideoList() {
       case "likes":
         setVideoList(videoList.sort((a, b) => b.likes - a.likes));
         break;
+      default:
+        setVideoList(videoList.sort((a, b) => b.id - a.id));
+        break;
     }
-    filteredByLikes = event.target.value === "likes" ? true : false;
+    isSortedByLikes = e.target.value === "likes" ? true : false;
 
     setVideoList(videoList.map((item) => item));
   };
 
-  const [query, setQuery] = useState("");
-
-  const foundVideos = videoList.filter(
-    (video) => {
-      return video.title.toLowerCase().includes(query.toLowerCase());
-    },
-    [videoList, query]
-  );
-
   return (
     <div className="filterable-video-list">
-      <Filter onFilter={filter}></Filter>
+      <br />
+      <VideoUpload handleUpload={handleUpload} />
       <br />
       <SearchInput
         videoList={videoList}
@@ -147,11 +183,9 @@ export default function FilterableVideoList() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
+      <Sorter handleSort={handleSort} />
       <br />
-      <VideoList
-        videoList={foundVideos}
-        setVideoList={setVideoList}
-      ></VideoList>
+      <VideoList videoList={foundVideos} setVideoList={setVideoList} />
     </div>
   );
 }

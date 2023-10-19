@@ -5,17 +5,40 @@
   box-sizing: border-box;
 }
 
-.App {
+.App,
+body {
   padding: 10px 33vw;
 }
 
 body {
   font-family: "Montserrat", sans-serif;
-  padding: 10px 33vw;
 }
 
-.filter > p:first-child,
-.search > p:first-child {
+input {
+  max-width: 34vw;
+}
+
+.video-upload > p:first-child {
+  font-weight: 700;
+}
+
+.video-upload > form > label[for="title"] {
+  margin-bottom: 0;
+}
+
+.video-upload > form > #title {
+  margin-top: 4px;
+  margin-right: 5px;
+  border: solid 1px #000;
+  border-radius: 5px;
+}
+
+.video-upload > form > input[type="submit"] {
+  margin-top: 5px;
+}
+
+.search > p:first-child,
+.sorter > p:first-child {
   margin-bottom: 4px;
 }
 
