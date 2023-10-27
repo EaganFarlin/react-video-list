@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 
-const VideoUpload = ({ videoList, setVideoList, handleUpload }) => {
+const VideoUpload = ({ handleUpload }) => {
   return (
     <div className="video-upload">
       <p>Upload</p>
@@ -16,7 +16,7 @@ const VideoUpload = ({ videoList, setVideoList, handleUpload }) => {
   );
 };
 
-const SearchInput = ({ videoList, setVideoList, query, onChange }) => {
+const SearchInput = ({ query, onChange }) => {
   return (
     <div className="search">
       <p>Search:</p>
@@ -118,14 +118,6 @@ export default function FilterableVideoList() {
     );
   };
 
-  let video1 = new VideoClass("Top 10 Pokemon Catches of All Time", 48, 12);
-  let video2 = new VideoClass(
-    "Try Not To Laugh Challenge (GONE WRONG!)",
-    623_523,
-    623_523
-  );
-  let video3 = new VideoClass("Pause Challenge on Family", 500, 12);
-
   const [videoList, setVideoList] = useState([]);
   const [query, setQuery] = useState("");
 
@@ -138,7 +130,7 @@ export default function FilterableVideoList() {
 
     const value = new VideoClass(e.currentTarget.title.value.toString());
     setVideoList((prev) => {
-      return [...prev, value];
+      return [value, ...prev];
     });
     currentVideoId++;
 
